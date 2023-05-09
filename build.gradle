@@ -51,7 +51,7 @@ publishing {
             pom {
                 name = libraryName
                 description = 'Java implementation of Apple Lossless decoder supports both 16-bit and 24-bit Apple Lossless files'
-                url = 'https://github.com/Tianscar/jald'
+                url = 'https://github.com/Tianscar/jaldec'
                 licenses {
                     license {
                         name = 'New BSD (3-clause) License'
@@ -66,9 +66,9 @@ publishing {
                     }
                 }
                 scm {
-                    connection = 'scm:git:git@github.com/Tianscar/jald.git'
-                    developerConnection = 'scm:git:git@github.com/Tianscar/jald.git'
-                    url = 'https://github.com/Tianscar/jald'
+                    connection = 'scm:git:git@github.com/Tianscar/jaldec.git'
+                    developerConnection = 'scm:git:git@github.com/Tianscar/jaldec.git'
+                    url = 'https://github.com/Tianscar/jaldec'
                 }
             }
         }

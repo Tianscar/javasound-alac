@@ -125,7 +125,7 @@ public class AlacTest {
     @Test
     @DisplayName("play MP4 from URL via SPI")
     public void playMP4URL() throws UnsupportedAudioFileException, IOException, LineUnavailableException {
-        URL url = new URL("https://github.com/Tianscar/jald/raw/main/src/test/resources/fbodemo1.m4a");
+        URL url = new URL("https://github.com/Tianscar/jaldec/raw/main/src/test/resources/fbodemo1.m4a");
         AudioInputStream mp4Ais = AudioSystem.getAudioInputStream(url);
         play(mp4Ais);
         mp4Ais.close();
