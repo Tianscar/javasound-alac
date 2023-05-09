@@ -10,31 +10,70 @@
 */
 package com.beatofthedrum.alacdecoder;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.RandomAccessFile;
+import java.io.File;
+
 public class AlacUtils
 {
-    public static AlacContext AlacOpenFileInput(String inputfilename)
+
+	public static AlacContext AlacOpenFileInput(AlacContext ac, String inputfilename)
+	{
+		try
+		{
+			return AlacOpenInput(ac, AlacInputStream.open(new RandomAccessFile(inputfilename, "r")));
+		}
+		catch (java.io.FileNotFoundException fe)
+		{
+			ac.error_message = new FileNotFoundException("Input file not found");
+			ac.error = true;
+			return (ac);
+		}
+	}
+
+	public static AlacContext AlacOpenFileInput(AlacContext ac, File inputfile)
+	{
+		try
+		{
+			return AlacOpenInput(ac, AlacInputStream.open(new RandomAccessFile(inputfile, "r")));
+		}
+		catch (java.io.FileNotFoundException fe)
+		{
+			ac.error_message = new FileNotFoundException("Input file not found");
+			ac.error = true;
+			return (ac);
+		}
+	}
+
+	public static AlacContext AlacOpenResourceInput(AlacContext ac, ClassLoader resourceLoader, String inputfilename)
+	{
+		try
+		{
+			return AlacOpenInput(ac, AlacInputStream.open(resourceLoader, inputfilename));
+		}
+		catch (IOException ioe)
+		{
+			ac.error_message = new IOException("Could not load resource");
+			ac.error = true;
+			return (ac);
+		}
+	}
+
+	public static AlacContext AlacOpenStreamInput(AlacContext ac, InputStream input)
+	{
+		return AlacOpenInput(ac, AlacInputStream.open(input));
+	}
+
+    public static AlacContext AlacOpenInput(AlacContext ac, AlacInputStream input_stream)
     {
 		int headerRead;
 		QTMovieT qtmovie = new QTMovieT();
 		DemuxResT demux_res = new DemuxResT();
-		AlacContext ac = new AlacContext();
-		AlacInputStream input_stream;
 		AlacFile alac;
 		
 		ac.error = false;
-		
-		try
-		{
-			java.io.FileInputStream fistream;
-			fistream = new java.io.FileInputStream(inputfilename);
-			input_stream = new AlacInputStream(fistream);
-		}
-		catch (java.io.FileNotFoundException fe)
-		{
-			ac.error_message = "Input file not found";
-			ac.error = true;
-			return (ac);
-		}
 		
 		ac.input_stream = input_stream;
 		
@@ -47,52 +86,22 @@ public class AlacUtils
 			ac.error = true;
 			if (demux_res.format_read == 0)
 			{
-				ac.error_message = "Failed to load the QuickTime movie headers.";
+				String error_message = "Failed to load the QuickTime movie headers.";
 				if (demux_res.format_read != 0)
-					ac.error_message = ac.error_message + " File type: " + DemuxUtils.SplitFourCC(demux_res.format);
+					error_message = error_message + " File type: " + DemuxUtils.SplitFourCC(demux_res.format);
+				ac.error_message = new AlacException(error_message);
 			}
 			else
 			{
-				ac.error_message = "Error while loading the QuickTime movie headers.";
+				ac.error_message = new IOException("Error while loading the QuickTime movie headers.");
 			}
 			return (ac);
 		}
-		else if(headerRead == 3)
+		else if (headerRead == 3)
 		{
-			/*
-			** This section is used when the stream system being used doesn't support seeking
-			** We have kept track within the file where we need to go to, we close the file and
-			** skip bytes to go directly to that point
-			*/
-			
-			try
-			{
-				ac.input_stream.close();
-			}
-			catch(java.io.IOException ioe)
-			{
-				ac.error_message = "Error when seeking to start of music data";
-				ac.error = true;
-				return (ac);
-			}
-			
-			try
-			{
-				java.io.FileInputStream fistream;
-				fistream = new java.io.FileInputStream(inputfilename);
-				input_stream = new AlacInputStream(fistream);
-				ac.input_stream = input_stream;
-				
-				qtmovie.qtstream.stream = input_stream;
-				qtmovie.qtstream.currentPos = 0;
-				StreamUtils.stream_skip(qtmovie.qtstream, qtmovie.saved_mdat_pos);
-			}
-			catch (java.io.FileNotFoundException fe)
-			{
-				ac.error_message = "Input file not found";
-				ac.error = true;
-				return (ac);
-			}
+			ac.error_message = new AlacException("Error when seeking to start of music data");
+			ac.error = true;
+			return (ac);
 		}
 		
 		/* initialise the sound converter */
@@ -108,7 +117,7 @@ public class AlacUtils
 			
 	}
 	
-	public static void AlacCloseFile(AlacContext ac)
+	public static AlacContext AlacCloseInput(AlacContext ac)
 	{
 		if(null != ac.input_stream)
 		{
@@ -118,8 +127,11 @@ public class AlacUtils
 			}
 			catch(java.io.IOException ioe)
 			{
+				ac.error_message = new IOException("Error when closing file");
+				ac.error = true;
 			}
 		}
+		return ac;
 	}
 	
 	// Heres where we extract the actual music data
@@ -209,7 +221,7 @@ public class AlacUtils
     {
         if ( null != ac && ac.demux_res.sample_size != 0)
         {
-            return (int)Math.ceil(ac.demux_res.sample_size/8);
+            return (int)Math.ceil(ac.demux_res.sample_size/8.0);
         }
         else
         {
@@ -291,7 +303,7 @@ public class AlacUtils
      * @param position position in pcm samples to go to
      */
 
-    public static void AlacSetPosition(AlacContext ac, long position) {
+    public static AlacContext AlacSetPosition(AlacContext ac, long position) {
         DemuxResT res = ac.demux_res;
 
         int current_position = 0;
@@ -307,20 +319,30 @@ public class AlacUtils
                 last_chunk = res.stco.length;
             }
 
-            for (int chunk = chunkInfo.first_chunk; chunk <= last_chunk; chunk++) {
+            for (int chunk = chunkInfo.first_chunk; chunk <= last_chunk; chunk ++) {
                 int pos = res.stco[chunk - 1];
                 int sample_count = chunkInfo.samples_per_chunk;
                 while (sample_count > 0) {
                     int ret = get_sample_info(res, current_sample, sample_info);
-                    if (ret == 0) return;
+                    if (ret == 0) {
+						ac.error_message = new IOException("Error while reading sample info");
+						ac.error = true;
+						return ac;
+					}
                     current_position += sample_info.sample_duration;
                     if (position < current_position) {
-                        ac.input_stream.seek(pos);
-                        ac.current_sample_block = current_sample;
+						try {
+							ac.input_stream.seek(pos);
+						} catch (IOException e) {
+							ac.error_message = new IOException("Error when seeking");
+							ac.error = true;
+							return ac;
+						}
+						ac.current_sample_block = current_sample;
                         ac.offset =
                                 (int) (position - (current_position - sample_info.sample_duration))
                                         * AlacGetNumChannels(ac);
-                        return;
+                        return ac;
                     }
                     pos += sample_info.sample_byte_size;
                     current_sample++;
@@ -328,5 +350,6 @@ public class AlacUtils
                 }
             }
         }
+		return ac;
     }
 }
