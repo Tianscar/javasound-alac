@@ -9,8 +9,11 @@
 **
 */
 
-package com.beatofthedrum.alacdecoder;
-class DecoderDemo
+package com.beatofthedrum.alacdecoder.cli;
+
+import com.beatofthedrum.alacdecoder.*;
+
+public class DecoderDemo
 {
 
 	static java.io.FileOutputStream output_stream;
@@ -191,7 +194,7 @@ class DecoderDemo
 			System.exit(1);
 		}
 		
-		ac = AlacUtils.AlacOpenFileInput(input_file_n);
+		ac = AlacUtils.AlacOpenFileInput(new AlacContext(), input_file_n);
 		
 		if (ac.error)
         {
@@ -226,7 +229,7 @@ class DecoderDemo
 		/* will convert the entire buffer */
 		GetBuffer(ac);
 		
-		AlacUtils.AlacCloseFile(ac);
+		AlacUtils.AlacCloseInput(ac);
 
 		if (output_opened != 0)
 		{

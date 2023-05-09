@@ -11,6 +11,8 @@
 
 package com.beatofthedrum.alacdecoder;
 
+import java.io.IOException;
+
 class StreamUtils
 {
     public static void stream_read(MyStream mystream, int size, int[] buf, int startPos) {
@@ -132,9 +134,13 @@ class StreamUtils
         int toskip = skip;
         int bytes_read = 0;
 
-        if(toskip < 0)
+        if (toskip < 0)
 		{
-			System.err.println("stream_skip: request to seek backwards in stream - not supported, sorry");
+			try {
+				mystream.stream.seek(mystream.currentPos = (mystream.currentPos + skip));
+			} catch (IOException e) {
+				System.err.println("stream_skip: request to seek backwards in stream");
+			}
 			return;
 		}
 
@@ -160,8 +166,14 @@ class StreamUtils
 		return (mystream.currentPos);
 	}
 	public static int stream_setpos(MyStream mystream, int pos)
-	{		
-		return -1;
+	{
+		try {
+			mystream.stream.seek(pos);
+			mystream.currentPos = pos;
+			return 0;
+		} catch (IOException e) {
+			return -1;
+		}
 	}
 
 }

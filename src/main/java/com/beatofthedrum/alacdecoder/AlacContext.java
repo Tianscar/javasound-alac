@@ -15,10 +15,11 @@ public class AlacContext
 {
 	DemuxResT demux_res = new DemuxResT();
 	AlacFile alac = new AlacFile();
-	AlacInputStream input_stream;
+	public AlacInputStream input_stream;
 	int current_sample_block = 0;
-    int offset;
+	int offset;
 	public boolean error;
-	public String error_message = "";
-    byte[] read_buffer = new byte[1024 *80]; // sample big enough to hold any input for a single alac frame
+	public Exception error_message = null;
+	//public String error_message = "";
+    byte[] read_buffer = new byte[1024 * 80]; // sample big enough to hold any input for a single alac frame
 }
