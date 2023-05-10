@@ -52,8 +52,8 @@ public class AlacTest {
     }
 
     @Test
-    @DisplayName("AAC is not supported")
-    public void tryToDecodeAAC() {
+    @DisplayName("MPEG-4 AAC is not supported")
+    public void tryToDecodeMP4AAC() {
         assertThrows(UnsupportedAudioFileException.class, () -> {
             new AlacAudioFileReader().getAudioInputStream(new File("src/test/resources/fbodemo1_aac.m4a"));
         });
@@ -81,7 +81,7 @@ public class AlacTest {
     @Test
     @DisplayName("mp4 -> pcm, play via SPI")
     public void convertMP4ToPCMAndPlay() throws UnsupportedAudioFileException, IOException, LineUnavailableException {
-        File file = new File("src/test/resources/fbodemo1.m4a");
+        File file = new File("src/test/resources/fbodemo1_alac.m4a");
         System.out.println("file: " + file.getAbsolutePath());
         AudioInputStream aacAis = AudioSystem.getAudioInputStream(file);
         System.out.println("INS: " + aacAis);
@@ -107,7 +107,7 @@ public class AlacTest {
     @Test
     @DisplayName("play MP4 from InputStream via SPI")
     public void playMP4InputStream() throws UnsupportedAudioFileException, IOException, LineUnavailableException {
-        InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("fbodemo1.m4a");
+        InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("fbodemo1_alac.m4a");
         AudioInputStream mp4Ais = AudioSystem.getAudioInputStream(stream);
         play(mp4Ais);
         mp4Ais.close();
@@ -116,7 +116,7 @@ public class AlacTest {
     @Test
     @DisplayName("play MP4 from resource name via SPI")
     public void playMP4Resource() throws UnsupportedAudioFileException, IOException, LineUnavailableException {
-        AlacInputStream stream = AlacInputStream.open(Thread.currentThread().getContextClassLoader(), "fbodemo1.m4a");
+        AlacInputStream stream = AlacInputStream.open(Thread.currentThread().getContextClassLoader(), "fbodemo1_alac.m4a");
         AudioInputStream mp4Ais = AudioSystem.getAudioInputStream(stream);
         play(mp4Ais);
         mp4Ais.close();
@@ -125,7 +125,7 @@ public class AlacTest {
     @Test
     @DisplayName("play MP4 from URL via SPI")
     public void playMP4URL() throws UnsupportedAudioFileException, IOException, LineUnavailableException {
-        URL url = new URL("https://github.com/Tianscar/jaldec/raw/main/src/test/resources/fbodemo1.m4a");
+        URL url = new URL("https://github.com/Tianscar/audios-for-test/raw/main/src/test/resources/fbodemo1_alac.m4a");
         AudioInputStream mp4Ais = AudioSystem.getAudioInputStream(url);
         play(mp4Ais);
         mp4Ais.close();
@@ -134,7 +134,7 @@ public class AlacTest {
     @Test
     @DisplayName("list mp4 properties")
     public void listMP4Properties() throws UnsupportedAudioFileException, IOException {
-        File file = new File("src/test/resources/fbodemo1.m4a");
+        File file = new File("src/test/resources/fbodemo1_alac.m4a");
         AudioFileFormat mp4Aff = AudioSystem.getAudioFileFormat(file);
         for (Map.Entry<String, Object> entry : mp4Aff.properties().entrySet()) {
             System.out.println(entry.getKey() + ": " + entry.getValue());
@@ -142,6 +142,8 @@ public class AlacTest {
         for (Map.Entry<String, Object> entry : mp4Aff.getFormat().properties().entrySet()) {
             System.out.println(entry.getKey() + ": " + entry.getValue());
         }
+        System.out.println("framelength: " + mp4Aff.getFrameLength());
+        System.out.println("duration: " + (long) (((double) mp4Aff.getFrameLength() / (double) mp4Aff.getFormat().getFrameRate()) * 1_000_000L));
     }
 
 }

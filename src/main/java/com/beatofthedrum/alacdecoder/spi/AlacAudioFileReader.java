@@ -62,7 +62,7 @@ public class AlacAudioFileReader extends AudioFileReader {
         if (stream instanceof AlacInputStream) {
             AlacContext ac = AlacUtils.AlacOpenInput(new AlacContext(), (AlacInputStream) stream);
             throwExceptions(ac);
-            return new AlacAudioInputStream(ac, getAudioFormat(ac, new HashMap<>()), NOT_SPECIFIED);
+            return new AlacAudioInputStream(ac, getAudioFormat(ac, new HashMap<>()), AlacUtils.AlacGetNumSamples(ac));
         }
         stream.mark(1000);
         try {
@@ -77,7 +77,7 @@ public class AlacAudioFileReader extends AudioFileReader {
     private static AudioInputStream getAudioInputStreamNoMark(InputStream stream) throws UnsupportedAudioFileException, IOException {
         AlacContext ac = AlacUtils.AlacOpenStreamInput(new AlacContext(), stream);
         throwExceptions(ac);
-        return new AlacAudioInputStream(ac, getAudioFormat(ac, new HashMap<>()), NOT_SPECIFIED);
+        return new AlacAudioInputStream(ac, getAudioFormat(ac, new HashMap<>()), AlacUtils.AlacGetNumSamples(ac));
     }
 
     @Override
@@ -96,12 +96,12 @@ public class AlacAudioFileReader extends AudioFileReader {
     public AudioInputStream getAudioInputStream(File file) throws UnsupportedAudioFileException, IOException {
         AlacContext ac = AlacUtils.AlacOpenFileInput(new AlacContext(), file);
         throwExceptions(ac);
-        return new AlacAudioInputStream(ac, getAudioFormat(ac, new HashMap<>()), NOT_SPECIFIED);
+        return new AlacAudioInputStream(ac, getAudioFormat(ac, new HashMap<>()), AlacUtils.AlacGetNumSamples(ac));
     }
 
     private static void throwExceptions(AlacContext ac) throws UnsupportedAudioFileException, IOException {
         if (ac.error) {
-            if (ac.error_message instanceof AlacException) throw new UnsupportedAudioFileException(ac.error_message.getMessage());
+            if (ac.error_message instanceof AlacException) throw new UnsupportedAudioFileException();
             else if (ac.error_message instanceof IOException) throw (IOException) ac.error_message;
             else throw new IOException(ac.error_message);
         }
@@ -110,10 +110,21 @@ public class AlacAudioFileReader extends AudioFileReader {
     private static AudioFileFormat getAudioFileFormat(AlacContext ac,
                                                       Map<String, Object> fileProperties,
                                                       Map<String, Object> formatProperties) {
-        AudioFormat audioFormat = getAudioFormat(ac, formatProperties);
         int samples = AlacUtils.AlacGetNumSamples(ac);
-        fileProperties.put("duration", (long) (((double) samples / (double) audioFormat.getSampleRate()) * 1_000_000L));
-        return new AudioFileFormat(MP4_ALAC, audioFormat, NOT_SPECIFIED, fileProperties);
+        int sample_rate = AlacUtils.AlacGetSampleRate(ac);
+        int channels = AlacUtils.AlacGetNumChannels(ac);
+        int bytes_per_sample = AlacUtils.AlacGetBytesPerSample(ac);
+        int bits_per_sample = AlacUtils.AlacGetBitsPerSample(ac);
+        formatProperties.put("samples", samples);
+        formatProperties.put("samplerate", sample_rate);
+        formatProperties.put("samplesizeinbytes", bytes_per_sample);
+        formatProperties.put("samplesizeinbits", bits_per_sample);
+        formatProperties.put("channels", channels);
+        formatProperties.put("bigendian", false);
+        return new AudioFileFormat(MP4_ALAC,
+                new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, sample_rate, bits_per_sample,
+                channels, frameSize(channels, bits_per_sample),
+                sample_rate, false, formatProperties), samples, fileProperties);
     }
 
     private static AudioFormat getAudioFormat(AlacContext ac, Map<String, Object> formatProperties) {

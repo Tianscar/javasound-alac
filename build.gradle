@@ -9,8 +9,8 @@ ext {
     libraryGroupName = 'com.tianscar.javasound'
     libraryVendorName = 'Tianscar'
 
-    libraryVersionCode = 1
-    libraryVersionName = '0.2.1'
+    libraryVersionCode = 2
+    libraryVersionName = '0.2.2'
 
     librarySourceCompatibility = JavaVersion.VERSION_1_8
     libraryTargetCompatibility = JavaVersion.VERSION_1_8
@@ -51,10 +51,10 @@ publishing {
             pom {
                 name = libraryName
                 description = 'Java implementation of Apple Lossless decoder supports both 16-bit and 24-bit Apple Lossless files'
-                url = 'https://github.com/Tianscar/jaldec'
+                url = 'https://github.com/Tianscar/javasound-alac'
                 licenses {
                     license {
-                        name = 'New BSD (3-clause) License'
+                        name = 'BSD 3-Clause \"New\" or \"Revised\" License'
                         url = 'http://opensource.org/licenses/BSD-3-Clause'
                     }
                 }
@@ -66,9 +66,9 @@ publishing {
                     }
                 }
                 scm {
-                    connection = 'scm:git:git@github.com/Tianscar/jaldec.git'
-                    developerConnection = 'scm:git:git@github.com/Tianscar/jaldec.git'
-                    url = 'https://github.com/Tianscar/jaldec'
+                    connection = 'scm:git:git@github.com/Tianscar/javasound-alac.git'
+                    developerConnection = 'scm:git:git@github.com/Tianscar/javasound-alac.git'
+                    url = 'https://github.com/Tianscar/javasound-alac'
                 }
             }
         }

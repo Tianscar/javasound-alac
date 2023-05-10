@@ -12,7 +12,7 @@ public class PlayerExample {
 
 	static SourceDataLine output_stream;
 	static int output_opened;
-	static String input_file_n = "src/test/resources/fbodemo1.m4a";
+	static String input_file_n = "src/test/resources/fbodemo1_alac.m4a";
 
     // Reformat samples from longs in processor's native endian mode to
     // little-endian data with (possibly) less than 3 bytes / sample.

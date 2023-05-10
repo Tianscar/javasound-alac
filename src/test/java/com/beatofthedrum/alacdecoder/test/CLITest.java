@@ -9,7 +9,7 @@ public class CLITest {
     @Test
     @DisplayName("mp4 -> wav")
     public void decode() {
-        DecoderDemo.main(new String[] {"src/test/resources/fbodemo1.m4a", "fbodemo1.wav"});
+        DecoderDemo.main(new String[] {"src/test/resources/fbodemo1_alac.m4a", "fbodemo1.wav"});
     }
 
 }
