@@ -121,4 +121,9 @@ class AlacRAFInputStream extends AlacInputStream {
         fIn.seek(pos);
     }
 
+    @Override
+    public int offset() throws IOException {
+        return (int) fIn.getFilePointer();
+    }
+
 }

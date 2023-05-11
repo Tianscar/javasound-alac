@@ -184,4 +184,9 @@ class AlacResourceInputStream extends AlacInputStream {
 		return in.readUTF();
 	}
 
+	@Override
+	public int offset() {
+		return offset;
+	}
+
 }

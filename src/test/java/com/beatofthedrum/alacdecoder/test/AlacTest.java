@@ -65,7 +65,7 @@ public class AlacTest {
         line.open(pcmAis.getFormat());
         line.start();
 
-        byte[] buf = new byte[1024 * 6];
+        byte[] buf = new byte[1024 * 12];
         while (true) {
             int r = pcmAis.read(buf, 0, buf.length);
             if (r < 0) {
@@ -82,11 +82,11 @@ public class AlacTest {
     @DisplayName("mp4 -> pcm, play via SPI")
     public void convertMP4ToPCMAndPlay() throws UnsupportedAudioFileException, IOException, LineUnavailableException {
         File file = new File("src/test/resources/fbodemo1_alac.m4a");
-        System.out.println("file: " + file.getAbsolutePath());
-        AudioInputStream aacAis = AudioSystem.getAudioInputStream(file);
-        System.out.println("INS: " + aacAis);
-        AudioFormat inAudioFormat = aacAis.getFormat();
-        System.out.println("INF: " + inAudioFormat);
+        System.out.println("in file: " + file.getAbsolutePath());
+        AudioInputStream alacAis = AudioSystem.getAudioInputStream(file);
+        System.out.println("in stream: " + alacAis);
+        AudioFormat inAudioFormat = alacAis.getFormat();
+        System.out.println("in audio format: " + inAudioFormat);
         AudioFormat outAudioFormat = new AudioFormat(
             inAudioFormat.getSampleRate(),
             16,
@@ -96,9 +96,9 @@ public class AlacTest {
 
         assertTrue(AudioSystem.isConversionSupported(outAudioFormat, inAudioFormat));
 
-        AudioInputStream pcmAis = AudioSystem.getAudioInputStream(outAudioFormat, aacAis);
-        System.out.println("OUTS: " + pcmAis);
-        System.out.println("OUT: " + pcmAis.getFormat());
+        AudioInputStream pcmAis = AudioSystem.getAudioInputStream(outAudioFormat, alacAis);
+        System.out.println("out stream: " + pcmAis);
+        System.out.println("out audio format: " + pcmAis.getFormat());
 
         play(pcmAis);
         pcmAis.close();
@@ -125,7 +125,7 @@ public class AlacTest {
     @Test
     @DisplayName("play MP4 from URL via SPI")
     public void playMP4URL() throws UnsupportedAudioFileException, IOException, LineUnavailableException {
-        URL url = new URL("https://github.com/Tianscar/audios-for-test/raw/main/src/test/resources/fbodemo1_alac.m4a");
+        URL url = new URL("https://github.com/Tianscar/fbodemo1/raw/main/fbodemo1_alac.m4a");
         AudioInputStream mp4Ais = AudioSystem.getAudioInputStream(url);
         play(mp4Ais);
         mp4Ais.close();

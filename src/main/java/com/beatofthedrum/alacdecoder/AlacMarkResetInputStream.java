@@ -137,4 +137,9 @@ class AlacMarkResetInputStream extends AlacInputStream {
 		return in.readUTF();
 	}
 
+	@Override
+	public int offset() {
+		return offset;
+	}
+
 }

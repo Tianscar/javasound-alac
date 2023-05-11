@@ -14,6 +14,6 @@ package com.beatofthedrum.alacdecoder;
 class MyStream
 {
 	public AlacInputStream stream;
-	public int currentPos = 0;
+	//public int currentPos = 0;
     public byte[] read_buf = new byte[8];
 }

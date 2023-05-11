@@ -24,10 +24,14 @@ public class AlacAudioFileReader extends AudioFileReader {
 
     @Override
     public AudioFileFormat getAudioFileFormat(InputStream stream) throws UnsupportedAudioFileException, IOException {
-        stream.mark(1000);
-        AlacContext ac = AlacUtils.AlacOpenStreamInput(new AlacContext(), stream);
+        final AlacContext ac;
+        if (stream instanceof AlacInputStream) ac = AlacUtils.AlacOpenInput(new AlacContext(), (AlacInputStream) stream);
+        else {
+            stream.mark(1000);
+            ac = AlacUtils.AlacOpenStreamInput(new AlacContext(), stream);
+        }
         if (ac.error) {
-            stream.reset();
+            if (!(stream instanceof AlacInputStream)) stream.reset();
             throwExceptions(ac);
         }
         return getAudioFileFormat(ac, new HashMap<>(), new HashMap<>());

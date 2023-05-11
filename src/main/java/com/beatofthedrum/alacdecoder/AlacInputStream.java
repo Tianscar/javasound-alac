@@ -10,8 +10,8 @@ public abstract class AlacInputStream extends InputStream implements DataInput {
 
     static final int MAX_BUFFER_SIZE = Integer.MAX_VALUE - 8;
 
-    public static AlacInputStream open(RandomAccessFile fIn) {
-        return new AlacRAFInputStream(fIn);
+    public static AlacInputStream open(RandomAccessFile file) {
+        return new AlacRAFInputStream(file);
     }
 
     public static AlacInputStream open(ClassLoader resourceLoader, String resource) throws IOException {
@@ -23,5 +23,6 @@ public abstract class AlacInputStream extends InputStream implements DataInput {
     }
 
     public abstract void seek(int pos) throws IOException;
+    public abstract int offset() throws IOException;
 
 }

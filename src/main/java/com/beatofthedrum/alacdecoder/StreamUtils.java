@@ -35,7 +35,7 @@ class StreamUtils
 		{
 			System.err.println("stream_read: exception thrown: " + err);
 		}
-		mystream.currentPos = mystream.currentPos + bytes_read;
+		//mystream.currentPos = mystream.currentPos + bytes_read;
         return bytes_read;
 	}
 
@@ -49,7 +49,7 @@ class StreamUtils
 		try
 		{
 			bytes_read = mystream.stream.read(bytebuf, 0, 4);
-			mystream.currentPos = mystream.currentPos + bytes_read;
+			//mystream.currentPos = mystream.currentPos + bytes_read;
 			tmp =  (bytebuf[0] & 0xff);
 
 			v = tmp << 24;
@@ -78,7 +78,7 @@ class StreamUtils
 		try
 		{
 			v = mystream.stream.readShort();
-			mystream.currentPos = mystream.currentPos + 2;
+			//mystream.currentPos = mystream.currentPos + 2;
 		}
 		catch (Exception err)
 		{
@@ -96,7 +96,7 @@ class StreamUtils
 		try
 		{
 			bytes_read = mystream.stream.read(bytebuf, 0, 2);
-			mystream.currentPos = mystream.currentPos + bytes_read;
+			//mystream.currentPos = mystream.currentPos + bytes_read;
 			tmp =  (bytebuf[0] & 0xff);
 			v = tmp << 8;
 			tmp =  (bytebuf[1] & 0xff);
@@ -120,7 +120,7 @@ class StreamUtils
 		{
 			bytes_read = mystream.stream.read(bytebuf, 0, 1);
 			v =  (bytebuf[0] & 0xff);
-			mystream.currentPos = mystream.currentPos + 1;
+			//mystream.currentPos = mystream.currentPos + 1;
 		}
 		catch (Exception e)
 		{
@@ -137,7 +137,8 @@ class StreamUtils
         if (toskip < 0)
 		{
 			try {
-				mystream.stream.seek(mystream.currentPos = (mystream.currentPos + skip));
+				mystream.stream.skipBytes(skip);
+				//mystream.stream.seek(mystream.currentPos = (mystream.currentPos + skip));
 			} catch (IOException e) {
 				System.err.println("stream_skip: request to seek backwards in stream");
 			}
@@ -147,7 +148,7 @@ class StreamUtils
         try
         {
             bytes_read = mystream.stream.skipBytes(toskip);
-            mystream.currentPos = mystream.currentPos + bytes_read;
+            //mystream.currentPos = mystream.currentPos + bytes_read;
         }
         catch (java.io.IOException ioe)
         {
@@ -156,20 +157,28 @@ class StreamUtils
 
 	public static int stream_eof(MyStream mystream)
 	{
-		// TODO
-
-		return 0;
+		try {
+			return mystream.stream.available() == 0 ? 1 : 0;
+		} catch (IOException e) {
+			return 0;
+		}
 	}
 
 	public static int stream_tell(MyStream mystream)
 	{
-		return (mystream.currentPos);
+		try {
+			return mystream.stream.offset();
+		}
+		catch (IOException e) {
+			return -1;
+		}
+		//return (mystream.currentPos);
 	}
 	public static int stream_setpos(MyStream mystream, int pos)
 	{
 		try {
 			mystream.stream.seek(pos);
-			mystream.currentPos = pos;
+			//mystream.currentPos = pos;
 			return 0;
 		} catch (IOException e) {
 			return -1;
