@@ -22,7 +22,7 @@ dependencies {
 
 ## Usage
 [Tests and Examples](/src/test/java/com/beatofthedrum/alacdecoder/test)  
-[Command-line interfaces](/src/test/com/beatofthedrum/alacdecoder/cli)
+[Command-line interfaces](/src/test/java/com/beatofthedrum/alacdecoder/cli)
 
 Note you need to download test audios [here](https://github.com/Tianscar/fbodemo1) and put them to /src/test/resources to run the test code properly!
 
