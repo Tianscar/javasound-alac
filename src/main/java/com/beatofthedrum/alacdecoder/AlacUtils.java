@@ -79,7 +79,14 @@ public class AlacUtils
 		
 		/* if qtmovie_read returns successfully, the stream is up to
 		 * the movie data, which can be used directly by the decoder */
-		headerRead = DemuxUtils.qtmovie_read(input_stream, qtmovie, demux_res);
+		try {
+			headerRead = DemuxUtils.qtmovie_read(input_stream, qtmovie, demux_res);
+		}
+		catch (IOException e) {
+			ac.error_message = e;
+			ac.error = true;
+			return ac;
+		}
 
 		if (headerRead == 0)
 		{
@@ -143,9 +150,7 @@ public class AlacUtils
         byte[] read_buffer = ac.read_buffer;
 		int destBufferSize = 1024 *24 * 3; // 24kb buffer = 4096 frames = 1 alac sample (we support max 24bps)
 		int outputBytes;
-		MyStream inputStream = new MyStream();
-
-		inputStream.stream = ac.input_stream;
+		AlacInputStream inputStream = ac.input_stream;
 		
 		// if current_sample_block is beyond last block then finished
 		
@@ -162,7 +167,14 @@ public class AlacUtils
 
         sample_byte_size = sampleinfo.sample_byte_size;
 
-		StreamUtils.stream_read(inputStream, sample_byte_size, read_buffer, 0);
+		try {
+			StreamUtils.stream_read(inputStream, sample_byte_size, read_buffer, 0);
+		}
+		catch (IOException e) {
+			ac.error = true;
+			ac.error_message = e;
+			return 0;
+		}
 		
 		/* now fetch */
 		outputBytes = destBufferSize;

@@ -10,6 +10,8 @@ public abstract class AlacInputStream extends InputStream implements DataInput {
 
     static final int MAX_BUFFER_SIZE = Integer.MAX_VALUE - 8;
 
+    byte[] read_buf = new byte[8];
+
     public static AlacInputStream open(RandomAccessFile file) {
         return new AlacRAFInputStream(file);
     }

@@ -13,13 +13,13 @@ package com.beatofthedrum.alacdecoder;
 
 class QTMovieT
 {
-	public MyStream qtstream;
+	public AlacInputStream qtstream;
 	public DemuxResT res;
 	public int saved_mdat_pos;
 
 	public QTMovieT()
 	{
 		saved_mdat_pos = 0;
-		qtstream = new MyStream();
+		qtstream = null;
 	}
 }

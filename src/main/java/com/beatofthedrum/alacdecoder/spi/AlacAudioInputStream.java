@@ -32,6 +32,10 @@ class AlacAudioInputStream extends AsynchronousAudioInputStream {
     public void execute() {
         try {
             int bytes_unpacked = AlacUtils.AlacUnpackSamples(ac, dstBuffer);
+            if (ac.error) {
+                if (ac.error_message instanceof IOException) throw (IOException) ac.error_message;
+                else throw new IOException(ac.error_message);
+            }
 
             if (bytes_unpacked > 0) {
                 format_samples(pcmBuffer, bps, dstBuffer, bytes_unpacked);

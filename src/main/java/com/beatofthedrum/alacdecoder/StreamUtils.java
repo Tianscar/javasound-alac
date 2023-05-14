@@ -15,170 +15,92 @@ import java.io.IOException;
 
 class StreamUtils
 {
-    public static void stream_read(MyStream mystream, int size, int[] buf, int startPos) {
+
+    public static void stream_read(AlacInputStream stream, int size, int[] buf, int startPos) throws IOException {
         byte[] byteBuf = new byte[size];
-        int bytes_read = stream_read(mystream, size, byteBuf, 0);
+        int bytes_read = stream_read(stream, size, byteBuf, 0);
         for(int i=0; i < bytes_read; i++) {
 			buf[startPos + i] = byteBuf[i];
 		}
     }
 
-	public static int stream_read(MyStream mystream, int size, byte[] buf, int startPos)
-	{
-		int bytes_read = 0;
-
-		try
-		{
-			bytes_read = mystream.stream.read(buf, startPos, size);
-		}
-		catch (Exception err)
-		{
-			System.err.println("stream_read: exception thrown: " + err);
-		}
-		//mystream.currentPos = mystream.currentPos + bytes_read;
-        return bytes_read;
+	public static int stream_read(AlacInputStream stream, int size, byte[] buf, int startPos) throws IOException {
+        return stream.read(buf, startPos, size);
 	}
 
-	public static int stream_read_uint32(MyStream mystream)
-	{
-		int v = 0;
-		int tmp = 0;
-		byte[] bytebuf = mystream.read_buf;
-		int bytes_read = 0;
+	public static int stream_read_uint32(AlacInputStream stream) throws IOException {
+		int v;
+		int tmp;
+		byte[] bytebuf = stream.read_buf;
 
-		try
-		{
-			bytes_read = mystream.stream.read(bytebuf, 0, 4);
-			//mystream.currentPos = mystream.currentPos + bytes_read;
-			tmp =  (bytebuf[0] & 0xff);
+		stream.read(bytebuf, 0, 4);
+		tmp =  (bytebuf[0] & 0xff);
 
-			v = tmp << 24;
-			tmp =  (bytebuf[1] & 0xff);
+		v = tmp << 24;
+		tmp =  (bytebuf[1] & 0xff);
 
-			v = v | (tmp << 16);
-			tmp =  (bytebuf[2] & 0xff);
+		v = v | (tmp << 16);
+		tmp =  (bytebuf[2] & 0xff);
 
-			v = v | (tmp << 8);
+		v = v | (tmp << 8);
 
-			tmp =  (bytebuf[3] & 0xff);
-			v = v | tmp;
-
-		}
-		catch (Exception err)
-		{
-			System.err.println("stream_read_uint32: exception thrown: " + err);
-		}
+		tmp =  (bytebuf[3] & 0xff);
+		v = v | tmp;
 		
 		return v;
 	}
 
-	public static int stream_read_int16(MyStream mystream)
-	{
-		int v = 0;
-		try
-		{
-			v = mystream.stream.readShort();
-			//mystream.currentPos = mystream.currentPos + 2;
-		}
-		catch (Exception err)
-		{
-		}
-		
-		return v;
+	public static int stream_read_int16(AlacInputStream stream) throws IOException {
+		return stream.readShort();
 	}
-	public static int stream_read_uint16(MyStream mystream)
-	{
-		int v = 0;
-		int tmp = 0;
-		byte[] bytebuf = mystream.read_buf;
-		int bytes_read = 0;
 
-		try
-		{
-			bytes_read = mystream.stream.read(bytebuf, 0, 2);
-			//mystream.currentPos = mystream.currentPos + bytes_read;
-			tmp =  (bytebuf[0] & 0xff);
-			v = tmp << 8;
-			tmp =  (bytebuf[1] & 0xff);
-			
-			v = v | tmp;
-		}
-		catch (Exception e)
-		{
-		}
+	public static int stream_read_uint16(AlacInputStream stream) throws IOException {
+		int v;
+		int tmp;
+		byte[] bytebuf = stream.read_buf;
+
+		stream.read(bytebuf, 0, 2);
+		tmp =  (bytebuf[0] & 0xff);
+		v = tmp << 8;
+		tmp =  (bytebuf[1] & 0xff);
+
+		v = v | tmp;
 
 		return v;
 	}
 
-	public static int stream_read_uint8(MyStream mystream)
-	{
-		int v = 0;
-		int bytes_read = 0;
-		byte[] bytebuf = mystream.read_buf;
-		
-		try
-		{
-			bytes_read = mystream.stream.read(bytebuf, 0, 1);
-			v =  (bytebuf[0] & 0xff);
-			//mystream.currentPos = mystream.currentPos + 1;
-		}
-		catch (Exception e)
-		{
-		}		
+	public static int stream_read_uint8(AlacInputStream stream) throws IOException {
+		int v;
+		byte[] bytebuf = stream.read_buf;
+
+		stream.read(bytebuf, 0, 1);
+		v =  (bytebuf[0] & 0xff);
 			
 		return v;
 	}
 
-	public static void stream_skip(MyStream mystream, int skip)
-	{
-        int toskip = skip;
-        int bytes_read = 0;
+	public static void stream_skip(AlacInputStream stream, int skip) throws IOException {
 
-        if (toskip < 0)
-		{
-			try {
-				mystream.stream.skipBytes(skip);
-				//mystream.stream.seek(mystream.currentPos = (mystream.currentPos + skip));
-			} catch (IOException e) {
-				System.err.println("stream_skip: request to seek backwards in stream");
-			}
+		if (skip < 0) {
+			stream.seek(stream.offset() + skip);
 			return;
 		}
 
-        try
-        {
-            bytes_read = mystream.stream.skipBytes(toskip);
-            //mystream.currentPos = mystream.currentPos + bytes_read;
-        }
-        catch (java.io.IOException ioe)
-        {
-        }
+		stream.skipBytes(skip);
     }
 
-	public static int stream_eof(MyStream mystream)
-	{
-		try {
-			return mystream.stream.available() == 0 ? 1 : 0;
-		} catch (IOException e) {
-			return 0;
-		}
+	public static int stream_eof(AlacInputStream stream) throws IOException {
+		return stream.available() == 0 ? 1 : 0;
 	}
 
-	public static int stream_tell(MyStream mystream)
-	{
-		try {
-			return mystream.stream.offset();
-		}
-		catch (IOException e) {
-			return -1;
-		}
-		//return (mystream.currentPos);
+	public static int stream_tell(AlacInputStream stream) throws IOException {
+		return stream.offset();
 	}
-	public static int stream_setpos(MyStream mystream, int pos)
+
+	public static int stream_setpos(AlacInputStream stream, int pos)
 	{
 		try {
-			mystream.stream.seek(pos);
-			//mystream.currentPos = pos;
+			stream.seek(pos);
 			return 0;
 		} catch (IOException e) {
 			return -1;

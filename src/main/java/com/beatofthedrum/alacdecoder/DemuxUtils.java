@@ -12,6 +12,8 @@
 package com.beatofthedrum.alacdecoder;
 
 
+import java.io.IOException;
+
 class DemuxUtils
 {
 	public static int MakeFourCC(int ch0, int ch1, int ch2, int ch3)
@@ -58,13 +60,12 @@ class DemuxUtils
 	}
 
 
-	public static int qtmovie_read(AlacInputStream file, QTMovieT qtmovie, DemuxResT demux_res)
-	{
+	public static int qtmovie_read(AlacInputStream file, QTMovieT qtmovie, DemuxResT demux_res) throws IOException {
 		int found_moov = 0;
 		int found_mdat = 0;
 
 		/* construct the stream */
-		qtmovie.qtstream.stream = file;
+		qtmovie.qtstream = file;
 
 		qtmovie.res = demux_res;
 
@@ -147,8 +148,7 @@ class DemuxUtils
 
 
 	/* chunk handlers */
-	static void read_chunk_ftyp(QTMovieT qtmovie, int chunk_len)
-	{
+	static void read_chunk_ftyp(QTMovieT qtmovie, int chunk_len) throws IOException {
 		int type = 0;
 		int minor_ver = 0;
 		int size_remaining = chunk_len - 8; // FIXME: can't hardcode 8, size may be 64bit
@@ -174,32 +174,28 @@ class DemuxUtils
 		}
 	}
 
-	static void read_chunk_tkhd(QTMovieT qtmovie, int chunk_len)
-	{
+	static void read_chunk_tkhd(QTMovieT qtmovie, int chunk_len) throws IOException {
 		/* don't need anything from here atm, skip */
 		int size_remaining = chunk_len - 8; // FIXME WRONG
 
 		StreamUtils.stream_skip(qtmovie.qtstream, size_remaining);
 	}
 
-	static void read_chunk_mdhd(QTMovieT qtmovie, int chunk_len)
-	{
+	static void read_chunk_mdhd(QTMovieT qtmovie, int chunk_len) throws IOException {
 		/* don't need anything from here atm, skip */
 		int size_remaining = chunk_len - 8; // FIXME WRONG
 
 		StreamUtils.stream_skip(qtmovie.qtstream, size_remaining);
 	}
 
-	static void read_chunk_edts(QTMovieT qtmovie, int chunk_len)
-	{
+	static void read_chunk_edts(QTMovieT qtmovie, int chunk_len) throws IOException {
 		/* don't need anything from here atm, skip */
 		int size_remaining = chunk_len - 8; // FIXME WRONG
 
 		StreamUtils.stream_skip(qtmovie.qtstream, size_remaining);
 	}
 
-	static void read_chunk_elst(QTMovieT qtmovie, int chunk_len)
-	{
+	static void read_chunk_elst(QTMovieT qtmovie, int chunk_len) throws IOException {
 		/* don't need anything from here atm, skip */
 		int size_remaining = chunk_len - 8; // FIXME WRONG
 
@@ -207,8 +203,7 @@ class DemuxUtils
 	}
 
 	/* media handler inside mdia */
-	static void read_chunk_hdlr(QTMovieT qtmovie, int chunk_len)
-	{
+	static void read_chunk_hdlr(QTMovieT qtmovie, int chunk_len) throws IOException {
 		int comptype = 0;
 		int compsubtype = 0;
 		int size_remaining = chunk_len - 8; // FIXME WRONG
@@ -251,8 +246,7 @@ class DemuxUtils
 		StreamUtils.stream_skip(qtmovie.qtstream, size_remaining);
 	}
 
-	static int read_chunk_stsd(QTMovieT qtmovie, int chunk_len)
-	{
+	static int read_chunk_stsd(QTMovieT qtmovie, int chunk_len) throws IOException {
 		int i;
 		int numentries = 0;
 		int size_remaining = chunk_len - 8; // FIXME WRONG
@@ -404,8 +398,7 @@ class DemuxUtils
 		return 1;
 	}
 
-	static void read_chunk_stts(QTMovieT qtmovie, int chunk_len)
-	{
+	static void read_chunk_stts(QTMovieT qtmovie, int chunk_len) throws IOException {
 		int i;
 		int numentries = 0;
 		int size_remaining = chunk_len - 8; // FIXME WRONG
@@ -447,8 +440,7 @@ class DemuxUtils
 		}
 	}
 
-	static void read_chunk_stsz(QTMovieT qtmovie, int chunk_len)
-	{
+	static void read_chunk_stsz(QTMovieT qtmovie, int chunk_len) throws IOException {
 		int i;
 		int numentries = 0;
 		int uniform_size = 0;
@@ -515,8 +507,7 @@ class DemuxUtils
 		}
 	}
 
-	static int read_chunk_stbl(QTMovieT qtmovie, int chunk_len)
-	{
+	static int read_chunk_stbl(QTMovieT qtmovie, int chunk_len) throws IOException {
 		int size_remaining = chunk_len - 8; // FIXME WRONG
 
 		while (size_remaining != 0)
@@ -578,9 +569,9 @@ class DemuxUtils
     /*
      * chunk to offset box
      */
-    private static void read_chunk_stco(QTMovieT qtmovie, int sub_chunk_len) {
+    private static void read_chunk_stco(QTMovieT qtmovie, int sub_chunk_len) throws IOException {
         //skip header and size
-        MyStream stream = qtmovie.qtstream;
+        AlacInputStream stream = qtmovie.qtstream;
         StreamUtils.stream_skip(stream, 4);
 
         int num_entries = StreamUtils.stream_read_uint32(stream);
@@ -594,9 +585,9 @@ class DemuxUtils
     /*
      * sample to chunk box
      */
-    private static void read_chunk_stsc(QTMovieT qtmovie, int sub_chunk_len) {
+    private static void read_chunk_stsc(QTMovieT qtmovie, int sub_chunk_len) throws IOException {
         //skip header and size
-        MyStream stream = qtmovie.qtstream;
+        AlacInputStream stream = qtmovie.qtstream;
         //skip version and other junk
         StreamUtils.stream_skip(stream, 4);
         int num_entries = StreamUtils.stream_read_uint32(stream);
@@ -610,8 +601,7 @@ class DemuxUtils
         }
     }
 
-    static int read_chunk_minf(QTMovieT qtmovie, int chunk_len)
-	{
+    static int read_chunk_minf(QTMovieT qtmovie, int chunk_len) throws IOException {
 		int dinf_size;
 		int stbl_size;
 		int size_remaining = chunk_len - 8; // FIXME WRONG
@@ -696,8 +686,7 @@ class DemuxUtils
 		return 1;
 	}
 
-	static int read_chunk_mdia(QTMovieT qtmovie, int chunk_len)
-	{
+	static int read_chunk_mdia(QTMovieT qtmovie, int chunk_len) throws IOException {
 		int size_remaining = chunk_len - 8; // FIXME WRONG
 
 		while (size_remaining != 0)
@@ -749,8 +738,7 @@ class DemuxUtils
 	}
 
 	/* 'trak' - a movie track - contains other atoms */
-	static int read_chunk_trak(QTMovieT qtmovie, int chunk_len)
-	{
+	static int read_chunk_trak(QTMovieT qtmovie, int chunk_len) throws IOException {
 		int size_remaining = chunk_len - 8; // FIXME WRONG
 
 		while (size_remaining != 0)
@@ -802,8 +790,7 @@ class DemuxUtils
 	}
 
 	/* 'mvhd' movie header atom */
-	static void read_chunk_mvhd(QTMovieT qtmovie, int chunk_len)
-	{
+	static void read_chunk_mvhd(QTMovieT qtmovie, int chunk_len) throws IOException {
 		/* don't need anything from here atm, skip */
 		int size_remaining = chunk_len - 8; // FIXME WRONG
 
@@ -811,8 +798,7 @@ class DemuxUtils
 	}
 
 	/* 'udta' user data.. contains tag info */
-	static void read_chunk_udta(QTMovieT qtmovie, int chunk_len)
-	{
+	static void read_chunk_udta(QTMovieT qtmovie, int chunk_len) throws IOException {
 		/* don't need anything from here atm, skip */
 		int size_remaining = chunk_len - 8; // FIXME WRONG
 
@@ -820,8 +806,7 @@ class DemuxUtils
 	}
 
 	/* 'iods' */
-	static void read_chunk_iods(QTMovieT qtmovie, int chunk_len)
-	{
+	static void read_chunk_iods(QTMovieT qtmovie, int chunk_len) throws IOException {
 		/* don't need anything from here atm, skip */
 		int size_remaining = chunk_len - 8; // FIXME WRONG
 
@@ -829,8 +814,7 @@ class DemuxUtils
 	}
 
 	/* 'moov' movie atom - contains other atoms */
-	static int read_chunk_moov(QTMovieT qtmovie, int chunk_len)
-	{
+	static int read_chunk_moov(QTMovieT qtmovie, int chunk_len) throws IOException {
 		int size_remaining = chunk_len - 8; // FIXME WRONG
 
 		while (size_remaining != 0)
@@ -893,8 +877,7 @@ class DemuxUtils
 		return 1;
 	}
 
-	static void read_chunk_mdat(QTMovieT qtmovie, int chunk_len, int skip_mdat)
-	{
+	static void read_chunk_mdat(QTMovieT qtmovie, int chunk_len, int skip_mdat) throws IOException {
 		int size_remaining = chunk_len - 8; // FIXME WRONG
 
 		if (size_remaining == 0)
