@@ -10,7 +10,7 @@ class AlacMarkResetInputStream extends AlacInputStream {
 
 	AlacMarkResetInputStream(InputStream in) throws IllegalArgumentException {
 		if (!in.markSupported()) throw new IllegalArgumentException("in.markSupported() == false");
-		this.in = new DataInputStream(in);
+		this.in = in instanceof DataInputStream ? (DataInputStream) in : new DataInputStream(in);
 		this.in.mark(MAX_BUFFER_SIZE);
 		lineReader = new BufferedReader(new InputStreamReader(in));
 		offset = 0;
