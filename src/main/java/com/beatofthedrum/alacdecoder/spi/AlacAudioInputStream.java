@@ -47,6 +47,11 @@ class AlacAudioInputStream extends AsynchronousAudioInputStream {
         }
     }
 
+    @Override
+    public long skip(long n) throws IOException {
+        return ac.input_stream.skip(n);
+    }
+
     // Reformat samples from longs in processor's native endian mode to
     // little-endian data with (possibly) less than 3 bytes / sample.
     private static void format_samples(byte[] dst, int bps, int[] src, int samcnt) {
