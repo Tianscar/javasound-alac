@@ -23,7 +23,7 @@ public class AlacUtils
 	{
 		try
 		{
-			return AlacOpenInput(ac, AlacInputStream.open(new RandomAccessFile(inputfilename, "r")));
+			return AlacOpenFileInput(ac, AlacInputStream.open(new RandomAccessFile(inputfilename, "r")));
 		}
 		catch (java.io.FileNotFoundException fe)
 		{
@@ -37,7 +37,7 @@ public class AlacUtils
 	{
 		try
 		{
-			return AlacOpenInput(ac, AlacInputStream.open(new RandomAccessFile(inputfile, "r")));
+			return AlacOpenFileInput(ac, AlacInputStream.open(new RandomAccessFile(inputfile, "r")));
 		}
 		catch (java.io.FileNotFoundException fe)
 		{
@@ -47,11 +47,11 @@ public class AlacUtils
 		}
 	}
 
-	public static AlacContext AlacOpenResourceInput(AlacContext ac, ClassLoader resourceLoader, String inputfilename)
+	public static AlacContext AlacOpenFileInput(AlacContext ac, ClassLoader resourceLoader, String inputfilename)
 	{
 		try
 		{
-			return AlacOpenInput(ac, AlacInputStream.open(resourceLoader, inputfilename));
+			return AlacOpenFileInput(ac, AlacInputStream.open(resourceLoader, inputfilename));
 		}
 		catch (IOException ioe)
 		{
@@ -61,12 +61,12 @@ public class AlacUtils
 		}
 	}
 
-	public static AlacContext AlacOpenStreamInput(AlacContext ac, InputStream input)
+	public static AlacContext AlacOpenFileInput(AlacContext ac, InputStream input)
 	{
-		return AlacOpenInput(ac, AlacInputStream.open(input));
+		return AlacOpenFileInput(ac, AlacInputStream.open(input));
 	}
 
-    public static AlacContext AlacOpenInput(AlacContext ac, AlacInputStream input_stream)
+    public static AlacContext AlacOpenFileInput(AlacContext ac, AlacInputStream input_stream)
     {
 		int headerRead;
 		QTMovieT qtmovie = new QTMovieT();
@@ -124,7 +124,7 @@ public class AlacUtils
 			
 	}
 	
-	public static AlacContext AlacCloseInput(AlacContext ac)
+	public static AlacContext AlacCloseFile(AlacContext ac)
 	{
 		if(null != ac.input_stream)
 		{

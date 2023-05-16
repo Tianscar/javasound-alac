@@ -25,10 +25,10 @@ public class AlacAudioFileReader extends AudioFileReader {
     @Override
     public AudioFileFormat getAudioFileFormat(InputStream stream) throws UnsupportedAudioFileException, IOException {
         final AlacContext ac;
-        if (stream instanceof AlacInputStream) ac = AlacUtils.AlacOpenInput(new AlacContext(), (AlacInputStream) stream);
+        if (stream instanceof AlacInputStream) ac = AlacUtils.AlacOpenFileInput(new AlacContext(), (AlacInputStream) stream);
         else {
             stream.mark(1000);
-            ac = AlacUtils.AlacOpenStreamInput(new AlacContext(), stream);
+            ac = AlacUtils.AlacOpenFileInput(new AlacContext(), stream);
         }
         if (ac.error) {
             if (!(stream instanceof AlacInputStream)) stream.reset();
@@ -39,13 +39,13 @@ public class AlacAudioFileReader extends AudioFileReader {
 
     @Override
     public AudioFileFormat getAudioFileFormat(URL url) throws UnsupportedAudioFileException, IOException {
-        AlacContext ac = AlacUtils.AlacOpenStreamInput(new AlacContext(), url.openStream());
+        AlacContext ac = AlacUtils.AlacOpenFileInput(new AlacContext(), url.openStream());
         throwExceptions(ac);
         try {
             return getAudioFileFormat(ac, new HashMap<>(), new HashMap<>());
         }
         finally {
-            AlacUtils.AlacCloseInput(ac);
+            AlacUtils.AlacCloseFile(ac);
         }
     }
 
@@ -57,20 +57,20 @@ public class AlacAudioFileReader extends AudioFileReader {
             return getAudioFileFormat(ac, new HashMap<>(), new HashMap<>());
         }
         finally {
-            AlacUtils.AlacCloseInput(ac);
+            AlacUtils.AlacCloseFile(ac);
         }
     }
 
     @Override
     public AudioInputStream getAudioInputStream(InputStream stream) throws UnsupportedAudioFileException, IOException {
         if (stream instanceof AlacInputStream) {
-            AlacContext ac = AlacUtils.AlacOpenInput(new AlacContext(), (AlacInputStream) stream);
+            AlacContext ac = AlacUtils.AlacOpenFileInput(new AlacContext(), (AlacInputStream) stream);
             throwExceptions(ac);
             return new AlacAudioInputStream(ac, getAudioFormat(ac, new HashMap<>()), AlacUtils.AlacGetNumSamples(ac));
         }
         stream.mark(1000);
         try {
-            AlacContext ac = AlacUtils.AlacOpenStreamInput(new AlacContext(), stream);
+            AlacContext ac = AlacUtils.AlacOpenFileInput(new AlacContext(), stream);
             throwExceptions(ac);
             return new AlacAudioInputStream(ac, getAudioFormat(ac, new HashMap<>()), AlacUtils.AlacGetNumSamples(ac));
         }
@@ -84,7 +84,7 @@ public class AlacAudioFileReader extends AudioFileReader {
     public AudioInputStream getAudioInputStream(URL url) throws UnsupportedAudioFileException, IOException {
         InputStream stream = url.openStream();
         try {
-            AlacContext ac = AlacUtils.AlacOpenStreamInput(new AlacContext(), stream);
+            AlacContext ac = AlacUtils.AlacOpenFileInput(new AlacContext(), stream);
             throwExceptions(ac);
             return new AlacAudioInputStream(ac, getAudioFormat(ac, new HashMap<>()), AlacUtils.AlacGetNumSamples(ac));
         }

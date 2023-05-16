@@ -229,7 +229,7 @@ public class DecoderDemo
 		/* will convert the entire buffer */
 		GetBuffer(ac);
 		
-		AlacUtils.AlacCloseInput(ac);
+		AlacUtils.AlacCloseFile(ac);
 
 		if (output_opened != 0)
 		{
