@@ -12,6 +12,7 @@
 package com.beatofthedrum.alacdecoder.cli;
 
 import com.beatofthedrum.alacdecoder.*;
+import com.beatofthedrum.alacdecoder.test.WavWriter;
 
 public class DecoderDemo
 {

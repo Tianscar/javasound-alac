@@ -11,6 +11,8 @@
 
 package com.beatofthedrum.alacdecoder;
 
+import java.io.IOException;
+
 public class AlacContext
 {
 	DemuxResT demux_res = new DemuxResT();
@@ -19,7 +21,7 @@ public class AlacContext
 	int current_sample_block = 0;
 	int offset;
 	public boolean error;
-	public Exception error_message = null;
+	public IOException error_message = null;
 	//public String error_message = "";
     byte[] read_buffer = new byte[1024 * 80]; // sample big enough to hold any input for a single alac frame
 }

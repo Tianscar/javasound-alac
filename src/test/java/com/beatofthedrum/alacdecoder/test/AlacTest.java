@@ -65,7 +65,7 @@ public class AlacTest {
         line.open(pcmAis.getFormat());
         line.start();
 
-        byte[] buf = new byte[1024 * 12];
+        byte[] buf = new byte[128 * 6];
         while (true) {
             int r = pcmAis.read(buf, 0, buf.length);
             if (r < 0) {
@@ -78,6 +78,17 @@ public class AlacTest {
         line.close();
     }
 
+    private AudioInputStream decode(AudioInputStream mp4Ais) {
+        AudioFormat inAudioFormat = mp4Ais.getFormat();
+        AudioFormat decodedAudioFormat = new AudioFormat(
+                AudioSystem.NOT_SPECIFIED,
+                inAudioFormat.getSampleSizeInBits(),
+                inAudioFormat.getChannels(),
+                true,
+                inAudioFormat.isBigEndian());
+        return AudioSystem.getAudioInputStream(decodedAudioFormat, mp4Ais);
+    }
+
     @Test
     @DisplayName("mp4 -> pcm, play via SPI")
     public void convertMP4ToPCMAndPlay() throws UnsupportedAudioFileException, IOException, LineUnavailableException {
@@ -87,14 +98,29 @@ public class AlacTest {
         System.out.println("in stream: " + alacAis);
         AudioFormat inAudioFormat = alacAis.getFormat();
         System.out.println("in audio format: " + inAudioFormat);
+
+        AudioFormat decodedAudioFormat = new AudioFormat(
+                AudioSystem.NOT_SPECIFIED,
+                inAudioFormat.getSampleSizeInBits(),
+                inAudioFormat.getChannels(),
+                true,
+                inAudioFormat.isBigEndian());
+
+        assertTrue(AudioSystem.isConversionSupported(decodedAudioFormat, inAudioFormat));
+
+        alacAis = AudioSystem.getAudioInputStream(decodedAudioFormat, alacAis);
+        decodedAudioFormat = alacAis.getFormat();
+        System.out.println("decoded in stream: " + alacAis);
+        System.out.println("decoded audio format: " + decodedAudioFormat);
+
         AudioFormat outAudioFormat = new AudioFormat(
-            inAudioFormat.getSampleRate(),
+            decodedAudioFormat.getSampleRate(),
             16,
-            inAudioFormat.getChannels(),
+            decodedAudioFormat.getChannels(),
             true,
             false);
 
-        assertTrue(AudioSystem.isConversionSupported(outAudioFormat, inAudioFormat));
+        assertTrue(AudioSystem.isConversionSupported(outAudioFormat, decodedAudioFormat));
 
         AudioInputStream pcmAis = AudioSystem.getAudioInputStream(outAudioFormat, alacAis);
         System.out.println("out stream: " + pcmAis);
@@ -108,7 +134,7 @@ public class AlacTest {
     @DisplayName("play MP4 from InputStream via SPI")
     public void playMP4InputStream() throws UnsupportedAudioFileException, IOException, LineUnavailableException {
         InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("fbodemo1_alac.m4a");
-        AudioInputStream mp4Ais = AudioSystem.getAudioInputStream(stream);
+        AudioInputStream mp4Ais = decode(AudioSystem.getAudioInputStream(stream));
         play(mp4Ais);
         mp4Ais.close();
     }
@@ -117,7 +143,7 @@ public class AlacTest {
     @DisplayName("play MP4 from resource name via SPI")
     public void playMP4Resource() throws UnsupportedAudioFileException, IOException, LineUnavailableException {
         AlacInputStream stream = AlacInputStream.open(Thread.currentThread().getContextClassLoader(), "fbodemo1_alac.m4a");
-        AudioInputStream mp4Ais = AudioSystem.getAudioInputStream(stream);
+        AudioInputStream mp4Ais = decode(AudioSystem.getAudioInputStream(stream));
         play(mp4Ais);
         mp4Ais.close();
     }
@@ -126,7 +152,7 @@ public class AlacTest {
     @DisplayName("play MP4 from URL via SPI")
     public void playMP4URL() throws UnsupportedAudioFileException, IOException, LineUnavailableException {
         URL url = new URL("https://github.com/Tianscar/fbodemo1/raw/main/fbodemo1_alac.m4a");
-        AudioInputStream mp4Ais = AudioSystem.getAudioInputStream(url);
+        AudioInputStream mp4Ais = decode(AudioSystem.getAudioInputStream(url));
         play(mp4Ais);
         mp4Ais.close();
     }
