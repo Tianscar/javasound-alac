@@ -36,7 +36,6 @@ public class AlacAudioFormat extends AudioFormat {
 
     private static Map<String, Object> generateProperties(AlacContext ac) {
         Map<String, Object> properties = new HashMap<>();
-        properties.put("vbr", true);
         properties.put("bitrate", AlacUtils.AlacGetBitsPerSample(ac) * AlacUtils.AlacGetSampleRate(ac));
         return properties;
     }
