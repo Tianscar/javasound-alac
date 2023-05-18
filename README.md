@@ -28,3 +28,8 @@ Note you need to download test audios [here](https://github.com/Tianscar/fbodemo
 
 ## License
 [BSD 3-Clause](/LICENSE)
+
+### Dependencies
+| Library                                                                    | License | Comptime | Runtime |
+|----------------------------------------------------------------------------|---------|----------|---------|
+| [JavaSound ResLoader SPI](https://github.com/Tianscar/javasound-resloader) | MIT     | Yes      | No      |
