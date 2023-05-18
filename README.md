@@ -16,7 +16,7 @@ repositories {
 ```groovy
 dependencies {
     ...
-    implementation 'com.tianscar.javasound:javasound-alac:0.2.2'
+    implementation 'com.tianscar.javasound:javasound-alac:0.2.3'
 }
 ```
 

@@ -158,11 +158,15 @@ public class AlacUtils
 		{
 			return 0;
 		}
-		
-		if (get_sample_info(ac.demux_res, ac.current_sample_block , sampleinfo) == 0)
-		{
+
+		try {
+			get_sample_info(ac.demux_res, ac.current_sample_block , sampleinfo);
+		}
+		catch (AlacException e) {
+			ac.error = true;
+			ac.error_message = e;
 			// getting sample failed
-				return 0;
+			return 0;
 		}
 
         sample_byte_size = sampleinfo.sample_byte_size;
@@ -253,19 +257,22 @@ public class AlacUtils
 		SampleDuration sampleinfo = new SampleDuration();
 		int i;
 		boolean error_found = false;
-		int retval = 0;
 			
 		for (i = 0; i < ac.demux_res.sample_byte_size.length; i++)
 		{
 			thissample_duration = 0;
 			thissample_bytesize = 0;
 
-			retval = get_sample_info(ac.demux_res, i, sampleinfo);
-			
-			if(retval == 0)
-			{
+			try {
+				get_sample_info(ac.demux_res, ac.current_sample_block , sampleinfo);
+			}
+			catch (AlacException e) {
+				ac.error = true;
+				ac.error_message = e;
+				// getting sample failed
 				return (-1);
 			}
+
 			thissample_duration = sampleinfo.sample_duration;
 			thissample_bytesize = sampleinfo.sample_byte_size;
 
@@ -276,21 +283,18 @@ public class AlacUtils
 	}
 	
 
-	static int get_sample_info(DemuxResT demux_res, int samplenum, SampleDuration sampleinfo)
-	{
+	static void get_sample_info(DemuxResT demux_res, int samplenum, SampleDuration sampleinfo) throws AlacException {
 		int duration_index_accum = 0;
 		int duration_cur_index = 0;
 
 		if (samplenum >= demux_res.sample_byte_size.length)
 		{
-			System.err.println("sample " + samplenum + " does not exist ");
-			return 0;
+			throw new AlacException("sample " + samplenum + " does not exist ");
 		}
 
 		if (demux_res.num_time_to_samples == 0)		// was null
 		{
-			System.err.println("no time to samples");
-			return 0;
+			throw new AlacException("no time to samples");
 		}
 		while ((demux_res.time_to_sample[duration_cur_index].sample_count + duration_index_accum) <= samplenum)
 		{
@@ -298,15 +302,13 @@ public class AlacUtils
 			duration_cur_index++;
 			if (duration_cur_index >= demux_res.num_time_to_samples)
 			{
-				System.err.println("sample " + samplenum + " does not have a duration");
-				return 0;
+				throw new AlacException("sample " + samplenum + " does not have a duration");
 			}
 		}
 
 		sampleinfo.sample_duration = demux_res.time_to_sample[duration_cur_index].sample_duration;
 		sampleinfo.sample_byte_size = demux_res.sample_byte_size[samplenum];
 
-		return 1;
 	}
 
     /**
@@ -335,10 +337,12 @@ public class AlacUtils
                 int pos = res.stco[chunk - 1];
                 int sample_count = chunkInfo.samples_per_chunk;
                 while (sample_count > 0) {
-                    int ret = get_sample_info(res, current_sample, sample_info);
-                    if (ret == 0) {
-						ac.error_message = new IOException("Error while reading sample info");
+					try {
+						get_sample_info(res, current_sample, sample_info);
+					}
+					catch (AlacException e) {
 						ac.error = true;
+						ac.error_message = new IOException("Error while reading sample info");
 						return ac;
 					}
                     current_position += sample_info.sample_duration;

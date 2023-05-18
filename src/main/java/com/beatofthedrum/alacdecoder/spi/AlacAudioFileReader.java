@@ -39,8 +39,8 @@ public class AlacAudioFileReader extends AudioFileReader implements AudioResourc
     public AudioFileFormat getAudioFileFormat(URL url) throws UnsupportedAudioFileException, IOException {
         URLConnection connection = url.openConnection();
         AlacContext ac = AlacUtils.AlacOpenFileInput(new AlacContext(), connection.getInputStream());
-        throwExceptions(ac);
         try {
+            throwExceptions(ac);
             return new AlacAudioFileFormat(ac, connection.getContentLengthLong());
         }
         finally {
@@ -51,8 +51,8 @@ public class AlacAudioFileReader extends AudioFileReader implements AudioResourc
     @Override
     public AudioFileFormat getAudioFileFormat(File file) throws UnsupportedAudioFileException, IOException {
         AlacContext ac = AlacUtils.AlacOpenFileInput(new AlacContext(), file);
-        throwExceptions(ac);
         try {
+            throwExceptions(ac);
             return new AlacAudioFileFormat(ac, file.length());
         }
         finally {

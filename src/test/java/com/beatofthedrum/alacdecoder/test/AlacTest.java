@@ -25,6 +25,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -170,6 +171,19 @@ public class AlacTest {
         }
         System.out.println("framelength: " + mp4Aff.getFrameLength());
         System.out.println("duration: " + (long) (((double) mp4Aff.getFrameLength() / (double) mp4Aff.getFormat().getFrameRate()) * 1_000_000L));
+    }
+
+    @Test
+    @DisplayName("can play wav")
+    public void checkCanPlayWAV() throws IOException, UnsupportedAudioFileException, LineUnavailableException {
+        InputStream stream = Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResourceAsStream("fbodemo1.wav"));
+        stream.mark(Integer.MAX_VALUE);
+        AudioFileFormat audioFileFormat = AudioSystem.getAudioFileFormat(stream);
+        System.out.println(audioFileFormat);
+        stream.reset();
+        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(stream);
+        play(audioInputStream);
+        audioInputStream.close();
     }
 
 }

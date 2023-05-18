@@ -693,7 +693,7 @@ class AlacDecodeUtils
 				}
 				else
 				{
-					System.err.println("FIXME: unhandled predicition type: " +prediction_type);
+					AlacDebug.println("FIXME: unhandled predicition type: " +prediction_type);
 					
 					/* i think the only other prediction type (or perhaps this is just a
 					 * boolean?) runs adaptive fir twice.. like:
@@ -794,7 +794,7 @@ class AlacDecodeUtils
 			}
 			case 20:
 			case 32:
-				System.err.println("FIXME: unimplemented sample size " + alac.setinfo_sample_size);
+				AlacDebug.println("FIXME: unimplemented sample size " + alac.setinfo_sample_size);
 			default:
 
 			}
@@ -914,7 +914,7 @@ class AlacDecodeUtils
 				}
 				else
 				{ // see mono case
-					System.err.println("FIXME: unhandled predicition type: " + prediction_type_a);
+					AlacDebug.println("FIXME: unhandled predicition type: " + prediction_type_a);
 				}
 
 				/* channel 2 */
@@ -926,7 +926,7 @@ class AlacDecodeUtils
 				}
 				else
 				{
-					System.err.println("FIXME: unhandled predicition type: " + prediction_type_b);
+					AlacDebug.println("FIXME: unhandled predicition type: " + prediction_type_b);
 				}
 			}
 			else
@@ -997,7 +997,7 @@ class AlacDecodeUtils
 			}
 			case 20:
 			case 32:
-				System.err.println("FIXME: unimplemented sample size " + alac.setinfo_sample_size);
+				AlacDebug.println("FIXME: unimplemented sample size " + alac.setinfo_sample_size);
 
 			default:
 
