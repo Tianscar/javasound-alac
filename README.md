@@ -1,3 +1,5 @@
+WARNING: THIS PROJECT IS NO LONGER MAINTAINED. MOVED TO: https://github.com/jseproject/jse-spi
+
 # Java Implementation of Apple Lossless Decoder
 This is a fork of [Java-Apple-Lossless-decoder](https://github.com/soiaf/Java-Apple-Lossless-decoder), with JavaSound SPI support.
 
